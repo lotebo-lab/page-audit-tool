@@ -1,0 +1,313 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "type": "object",
+        "properties": {
+            "rowType": {
+                "type": "string",
+                "title": "Row type",
+                "description": "page on a row about one audited page, summary on the single run summary row that closes every successful run.",
+                "example": "page"
+            },
+            "url": {
+                "type": "string",
+                "title": "Page URL",
+                "description": "The page that was audited, after any redirect was followed.",
+                "example": "https://example.com/pricing"
+            },
+            "status": {
+                "type": ["integer", "null"],
+                "title": "HTTP status",
+                "description": "HTTP status of the page. 400 and above is reported as an issue.",
+                "example": 200
+            },
+            "title": {
+                "type": ["string", "null"],
+                "title": "Title",
+                "description": "Text of the <title> tag, or null when the page has none.",
+                "example": "Pricing - Example"
+            },
+            "titleLength": {
+                "type": "integer",
+                "title": "Title length",
+                "description": "Number of characters in the title, 0 when it is missing. Reported when over 60 or under 15.",
+                "example": 18
+            },
+            "titleMissing": {
+                "type": ["boolean", "integer"],
+                "title": "Title missing",
+                "description": "On a page row, true when the page has no <title> text. On the summary row, how many audited pages had no <title>.",
+                "example": false
+            },
+            "metaDescription": {
+                "type": ["string", "null"],
+                "title": "Meta description",
+                "description": "Content of <meta name=\"description\">, or null when absent. Reported when over 160 characters.",
+                "example": "Plans and prices for Example."
+            },
+            "metaDescriptionMissing": {
+                "type": ["boolean", "integer"],
+                "title": "Meta description missing",
+                "description": "On a page row, true when the page has no meta description. On the summary row, how many audited pages had none.",
+                "example": true
+            },
+            "h1Count": {
+                "type": "integer",
+                "title": "H1 count",
+                "description": "How many <h1> headings the page has. Zero and more than one are both reported.",
+                "example": 1
+            },
+            "headingOrderBroken": {
+                "type": "boolean",
+                "title": "Heading order broken",
+                "description": "True when the headings do not start at h1 or skip a level, for example h2 straight to h4.",
+                "example": false
+            },
+            "imagesWithoutAlt": {
+                "type": "integer",
+                "title": "Images without alt",
+                "description": "Number of <img> tags with no alt attribute, or with an alt containing only spaces. An explicit alt=\"\" marks a decorative image and is not counted.",
+                "example": 3
+            },
+            "formFieldsWithoutLabel": {
+                "type": "integer",
+                "title": "Form fields without label",
+                "description": "Number of input, select or textarea controls with no <label for=...>, no wrapping <label>, no aria-label, no aria-labelledby and no title. Hidden, submit, button, reset and image inputs are skipped.",
+                "example": 2
+            },
+            "canonical": {
+                "type": ["string", "null"],
+                "title": "Canonical URL",
+                "description": "The href of <link rel=\"canonical\">, or null when absent.",
+                "example": "https://example.com/pricing"
+            },
+            "canonicalMissing": {
+                "type": ["boolean", "integer"],
+                "title": "Canonical missing",
+                "description": "On a page row, true when the page has no canonical link. On the summary row, how many audited pages had none.",
+                "example": false
+            },
+            "issues": {
+                "type": "array",
+                "title": "Issues",
+                "description": "One short sentence per problem found on this page. Empty when the page passed every check.",
+                "items": { "type": "string" },
+                "example": ["missing meta description", "2 image(s) without alt text"]
+            },
+            "issueCount": {
+                "type": "integer",
+                "title": "Issue count",
+                "description": "How many entries the issues list has.",
+                "example": 2
+            },
+            "startUrl": {
+                "type": ["string", "null"],
+                "title": "Start URL",
+                "description": "Summary row only: the URL the crawl started from.",
+                "example": "https://example.com"
+            },
+            "finishedAt": {
+                "type": ["string", "null"],
+                "title": "Finished at",
+                "description": "Summary row only: when the run finished, in UTC.",
+                "example": "2026-09-20T15:04:05Z"
+            },
+            "pagesCrawled": {
+                "type": "integer",
+                "title": "Pages crawled",
+                "description": "Summary row only: how many pages the crawler visited.",
+                "example": 12
+            },
+            "pagesAudited": {
+                "type": "integer",
+                "title": "Pages audited",
+                "description": "Summary row only: how many pages answered with an HTML body and got a page row.",
+                "example": 12
+            },
+            "pagesSkippedByRobots": {
+                "type": "integer",
+                "title": "Pages skipped by robots.txt",
+                "description": "Summary row only: how many URLs were not fetched because the site's robots.txt disallows them for this Actor's user agent.",
+                "example": 0
+            },
+            "pagesWithIssues": {
+                "type": "integer",
+                "title": "Pages with issues",
+                "description": "Summary row only: how many audited pages had at least one defect.",
+                "example": 3
+            },
+            "totalIssues": {
+                "type": "integer",
+                "title": "Total defects",
+                "description": "Summary row only: how many defects were found across every audited page. Zero means the audit ran and found nothing to fix.",
+                "example": 7
+            },
+            "pagesWithoutH1": {
+                "type": "integer",
+                "title": "Pages without h1",
+                "description": "Summary row only: how many audited pages have no h1 heading.",
+                "example": 1
+            },
+            "pagesWithMultipleH1": {
+                "type": "integer",
+                "title": "Pages with more than one h1",
+                "description": "Summary row only: how many audited pages have two or more h1 headings.",
+                "example": 1
+            },
+            "pagesWithBrokenHeadingOrder": {
+                "type": "integer",
+                "title": "Pages with heading order broken",
+                "description": "Summary row only: how many audited pages do not start at h1 or skip a heading level.",
+                "example": 0
+            },
+            "durationSeconds": {
+                "type": "number",
+                "title": "Duration in seconds",
+                "description": "Summary row only: how long the crawl took.",
+                "example": 18.4
+            },
+            "chargedEvents": {
+                "type": "integer",
+                "title": "Charged events",
+                "description": "Summary row only: how many pay-per-event charges this run made. The summary row itself is never charged.",
+                "example": 13
+            },
+            "chargeLimitReached": {
+                "type": "boolean",
+                "title": "Charge limit reached",
+                "description": "Summary row only: true when the run stopped early because it reached the pay-per-event charge limit, so part of the site was not audited.",
+                "example": false
+            },
+            "chargeFailures": {
+                "type": "integer",
+                "title": "Charge failures",
+                "description": "Summary row only: how many charge calls did not go through. The audit continues regardless.",
+                "example": 0
+            },
+            "message": {
+                "type": "string",
+                "title": "Run message",
+                "description": "Summary row only: one plain English sentence with how many pages were crawled, how many were skipped by robots.txt and how many defects were found per category. When no defect was found it says so.",
+                "example": "No defects found: 12 page(s) were crawled and checked, and every one of them passed all eight checks."
+            }
+        }
+    },
+    "views": {
+        "overview": {
+            "title": "Page audit",
+            "description": "One row per page, with the issue list and the counts that matter most. The last row of the run is the summary row, marked summary in the Row column.",
+            "transformation": {
+                "fields": [
+                    "rowType",
+                    "url",
+                    "status",
+                    "issueCount",
+                    "titleMissing",
+                    "metaDescriptionMissing",
+                    "h1Count",
+                    "imagesWithoutAlt",
+                    "formFieldsWithoutLabel",
+                    "canonicalMissing",
+                    "issues"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "rowType": { "label": "Row", "format": "text" },
+                    "url": { "label": "Page", "format": "link" },
+                    "status": { "label": "Status", "format": "number" },
+                    "issueCount": { "label": "Issues", "format": "number" },
+                    "titleMissing": { "label": "No title", "format": "boolean" },
+                    "metaDescriptionMissing": { "label": "No description", "format": "boolean" },
+                    "h1Count": { "label": "H1", "format": "number" },
+                    "imagesWithoutAlt": { "label": "Images without alt", "format": "number" },
+                    "formFieldsWithoutLabel": { "label": "Fields without label", "format": "number" },
+                    "canonicalMissing": { "label": "No canonical", "format": "boolean" },
+                    "issues": { "label": "What to fix", "format": "array" }
+                }
+            }
+        },
+        "seo": {
+            "title": "SEO fields",
+            "description": "Title, meta description and canonical link, page by page.",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "title",
+                    "titleLength",
+                    "metaDescription",
+                    "metaDescriptionMissing",
+                    "canonical",
+                    "canonicalMissing"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "Page", "format": "link" },
+                    "title": { "label": "Title", "format": "text" },
+                    "titleLength": { "label": "Title length", "format": "number" },
+                    "metaDescription": { "label": "Meta description", "format": "text" },
+                    "metaDescriptionMissing": { "label": "No description", "format": "boolean" },
+                    "canonical": { "label": "Canonical", "format": "link" },
+                    "canonicalMissing": { "label": "No canonical", "format": "boolean" }
+                }
+            }
+        },
+        "runSummary": {
+            "title": "Run summary",
+            "description": "The single summary row every successful run writes: what was crawled, what robots.txt blocked, and how many defects were found in each category, zero included.",
+            "transformation": {
+                "fields": [
+                    "rowType",
+                    "startUrl",
+                    "pagesCrawled",
+                    "pagesAudited",
+                    "pagesSkippedByRobots",
+                    "pagesWithIssues",
+                    "totalIssues",
+                    "message",
+                    "finishedAt"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "rowType": { "label": "Row", "format": "text" },
+                    "startUrl": { "label": "Site", "format": "link" },
+                    "pagesCrawled": { "label": "Pages crawled", "format": "number" },
+                    "pagesAudited": { "label": "Pages audited", "format": "number" },
+                    "pagesSkippedByRobots": { "label": "Skipped by robots.txt", "format": "number" },
+                    "pagesWithIssues": { "label": "Pages with defects", "format": "number" },
+                    "totalIssues": { "label": "Defects", "format": "number" },
+                    "message": { "label": "Result", "format": "text" },
+                    "finishedAt": { "label": "Finished", "format": "text" }
+                }
+            }
+        },
+        "accessibility": {
+            "title": "Accessibility fields",
+            "description": "The HTML-level accessibility counts. Not a conformity report: contrast, focus order and anything that needs a rendered page are not measured.",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "imagesWithoutAlt",
+                    "formFieldsWithoutLabel",
+                    "h1Count",
+                    "headingOrderBroken"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "Page", "format": "link" },
+                    "imagesWithoutAlt": { "label": "Images without alt", "format": "number" },
+                    "formFieldsWithoutLabel": { "label": "Fields without label", "format": "number" },
+                    "h1Count": { "label": "H1", "format": "number" },
+                    "headingOrderBroken": { "label": "Heading order broken", "format": "boolean" }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Page Audit Tool output",
+    "description": "One dataset row per page that answered with an HTML body (rowType page), plus one summary row at the end of every successful run (rowType summary), plus a SUMMARY record with the same totals.",
+    "properties": {
+        "pages": {
+            "type": "string",
+            "title": "Audited pages and run summary",
+            "description": "One item per page, with rowType page: url, status, title, titleLength, titleMissing, metaDescription, metaDescriptionMissing, h1Count, headingOrderBroken, imagesWithoutAlt, formFieldsWithoutLabel, canonical, canonicalMissing, issues and issueCount. The last item of every run is the rowType summary row: pagesCrawled, pagesAudited, pagesSkippedByRobots, pagesWithIssues, totalIssues, the count per defect category and a plain English message, written even when no defect was found.",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        },
+        "summary": {
+            "type": "string",
+            "title": "Run summary record",
+            "description": "startUrl, pagesCrawled, pagesAudited, pagesSkippedByRobots, pagesWithIssues, the count per defect type, totalIssues, worstPages (up to ten), durationSeconds, chargedEvents, chargeLimitReached and chargeFailures.",
+            "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+        }
+    }
+}

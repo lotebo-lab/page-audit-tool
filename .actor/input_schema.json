@@ -1,0 +1,56 @@
+{
+    "title": "Page Audit Tool input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrl": {
+            "title": "Website",
+            "type": "string",
+            "description": "The site to audit. A bare domain is enough (example.com) and https:// is assumed. You can also give a full URL to start from a specific page.",
+            "editor": "textfield",
+            "prefill": "https://www.python.org",
+            "pattern": "^(https?://)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)+(:[0-9]+)?(/.*)?$"
+        },
+        "maxPages": {
+            "title": "Max pages to audit",
+            "type": "integer",
+            "description": "How many pages of the site are opened and checked. Each page is one charged event.",
+            "editor": "number",
+            "default": 25,
+            "minimum": 1,
+            "maximum": 5000,
+            "unit": "pages"
+        },
+        "maxDepth": {
+            "title": "Max crawl depth",
+            "type": "integer",
+            "description": "How many clicks away from the start page the crawler goes. 0 audits only the start page.",
+            "editor": "number",
+            "default": 3,
+            "minimum": 0,
+            "maximum": 20,
+            "unit": "levels"
+        },
+        "requestDelaySeconds": {
+            "title": "Delay between requests",
+            "type": "integer",
+            "description": "Seconds to wait between two requests to the same host. Keep it at 1 or more to stay polite. If the site's robots.txt asks for a longer Crawl-delay, the longer value is used.",
+            "editor": "number",
+            "default": 1,
+            "minimum": 0,
+            "maximum": 60,
+            "unit": "seconds"
+        },
+        "requestTimeoutSeconds": {
+            "title": "Request timeout",
+            "type": "integer",
+            "description": "Seconds to wait for a response before the page is reported as a timeout.",
+            "editor": "number",
+            "default": 15,
+            "minimum": 3,
+            "maximum": 120,
+            "unit": "seconds"
+        }
+    },
+    "required": ["startUrl"]
+}

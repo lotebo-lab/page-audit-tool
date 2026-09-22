@@ -1,0 +1,30 @@
+{
+    "actorSpecification": 1,
+    "name": "page-audit-tool",
+    "title": "SEO Audit and Accessibility Crawler: Alt Text, Meta Tags, Headings",
+    "description": "Give it a domain and it crawls the site page by page, with no sitemap, returning one row per page with twelve technical SEO and HTML accessibility defects: status, title, meta description, h1 count, heading order, alt text, form labels, canonical. An automated audit does not attest WCAG conformity.",
+    "version": "0.3",
+    "buildTag": "latest",
+    "dockerfile": "../Dockerfile",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "output": "./output_schema.json",
+    "minMemoryMbytes": 256,
+    "defaultMemoryMbytes": 1024,
+    "pay_per_event": {
+        "actorChargeEvents": {
+            "page-audited": {
+                "eventTitle": "Page audited",
+                "eventDescription": "Charged once for each page row written to the dataset: an HTML page that answered with a 2xx status and was checked for title, meta description, canonical tag, heading order, image alt text and form labels. HTTP errors, non-HTML files, redirects without content and pages blocked by robots.txt are never charged, and the same page under two URL spellings is charged once.",
+                "eventPriceUsd": 0.05
+            },
+            "site-report": {
+                "eventTitle": "Site report",
+                "eventDescription": "The summary report for the whole run: totals per problem type and the worst pages. Charged once per run, only when at least one page was audited.",
+                "eventPriceUsd": 0.25
+            }
+        }
+    }
+}
