@@ -1,14 +1,27 @@
 # SEO Audit and Accessibility Crawler: Alt Text, Meta Tags, Headings
-
+You need to know which pages of a site are missing alt text, a title, a meta description or a canonical link, and a browser extension checks only one page at a time.
 **Run it on the Apify Store: https://apify.com/lotebo-lab/page-audit-tool**
-
-You need to know which pages of a site are missing alt text, a title, a meta description or a canonical link. A browser extension checks one page at a time, and that does not work once the site has hundreds of pages.
 
 Give this Actor a domain. It crawls the site page by page, with no sitemap and no URL list needed, and returns one row per page with twelve technical SEO and HTML accessibility checks, plus a short list of plain sentences saying what to fix on that page.
 
 **It measures the technical rules a program can check in HTML source. An automated audit does not attest conformity with WCAG, with Directive (EU) 2019/882 (the European Accessibility Act) or with any search engine guideline.** See "Automated checks are not a statement of legal conformity" below.
 
 This repository holds the source code. The Actor runs on the Apify platform, so there is nothing to install and nothing to host.
+
+## Quick start
+
+1. Open https://apify.com/lotebo-lab/page-audit-tool and switch the input to JSON.
+2. Paste this input, which is valid against [`.actor/input_schema.json`](.actor/input_schema.json), and start the run:
+
+```json
+{
+  "startUrl": "https://www.python.org",
+  "maxPages": 25,
+  "maxDepth": 3
+}
+```
+
+Price, as read from the public Apify Store API (`currentPricingInfo`) on 2026-09-23 16:25 UTC: US$ 0.05 per `page-audited` event (one audit row) plus US$ 0.25 per `site-report` event, once per run. Apify charges the platform usage of the run on top; that part is set by the platform, not by this Actor. The full table is under "Price".
 
 ## Use cases
 
@@ -121,7 +134,7 @@ A page with images and a form field:
 
 ## Price
 
-Pay per event, two events. These are the prices in force on the platform, so they are what a run of yours is charged:
+Pay per event, two events. These prices were read from the public Apify Store API (`currentPricingInfo`) on 2026-09-23 16:25 UTC, and they are what a run of yours is charged:
 
 | event | price | when it is charged |
 |---|---|---|
