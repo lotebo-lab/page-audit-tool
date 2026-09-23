@@ -1,26 +1,63 @@
 # SEO Audit and Accessibility Crawler: Alt Text, Meta Tags, Headings
 
-Run it on Apify Store: https://apify.com/lotebo-lab/page-audit-tool
+**Run it on the Apify Store: https://apify.com/lotebo-lab/page-audit-tool**
 
-You need to know which pages of a site are missing alt text, a title, a meta description or a canonical link, and checking them one by one in a browser extension is not an option when the site has hundreds of pages.
+You need to know which pages of a site are missing alt text, a title, a meta description or a canonical link. A browser extension checks one page at a time, and that does not work once the site has hundreds of pages.
 
-Give this Actor a domain. It crawls the site page by page, with no sitemap and no URL list needed, and returns one row per page with twelve technical SEO and HTML accessibility checks scored, plus a short list of plain sentences saying what to fix on that page.
+Give this Actor a domain. It crawls the site page by page, with no sitemap and no URL list needed, and returns one row per page with twelve technical SEO and HTML accessibility checks, plus a short list of plain sentences saying what to fix on that page.
 
-**It measures the technical rules of WCAG and SEO that a program can check in the HTML source. An automated audit does not attest conformity with WCAG, with Directive (EU) 2019/882 (the European Accessibility Act) or with any search engine guideline.** See "Automated checks are not a statement of legal conformity" below.
+**It measures the technical rules a program can check in HTML source. An automated audit does not attest conformity with WCAG, with Directive (EU) 2019/882 (the European Accessibility Act) or with any search engine guideline.** See "Automated checks are not a statement of legal conformity" below.
 
-## Who runs it, and when
+This repository holds the source code. The Actor runs on the Apify platform, so there is nothing to install and nothing to host.
 
-- **Agencies and freelancers** taking over a site, who need the defect list of the whole site before quoting the work or before the first invoice;
-- **in-house marketing and content teams** doing a periodic technical SEO pass, where missing titles and meta descriptions across a section matter more than one perfect page;
-- **developers preparing an accessibility review**, who want the machine-checkable defects (images with no alt text, form fields with no accessible name, headings out of order) listed by page, so the human review starts where the problems are;
-- **anyone after a migration or a redesign**, when templates changed and nobody knows which pages lost their canonical link.
+## Use cases
 
-## What comes out, field by field
+Each page below is a ready-made run of this Actor: it shows the input used, the fields that come back, and a Run button. The same page is served as Markdown by adding `.md` to the URL.
 
-One dataset row per page that answered with an HTML body. These are all the columns, and there are no others; the same names are declared in `.actor/dataset_schema.json` and checked by `tests/test_schemas.py`.
+| question | page |
+|---|---|
+| Which pages on my site have no title or meta description? | https://apify.com/lotebo-lab/page-audit-tool/examples/find-pages-missing-title-and-meta-description |
+| Which pages on my site have no meta description? | https://apify.com/lotebo-lab/page-audit-tool/examples/find-pages-missing-meta-description |
+| How do I find every image with missing alt text on a website? | https://apify.com/lotebo-lab/page-audit-tool/examples/find-images-missing-alt-text |
+| How do I list every image missing alt text on my site? | https://apify.com/lotebo-lab/page-audit-tool/examples/list-images-without-alt-text-on-a-site |
+| Which pages have no H1 or a broken heading order? | https://apify.com/lotebo-lab/page-audit-tool/examples/find-pages-with-no-h1-or-broken-heading-order |
+| Which accessibility defects can I find automatically? | https://apify.com/lotebo-lab/page-audit-tool/examples/european-accessibility-act-website-check |
+| What data goes into an SEO audit report for a client? | https://apify.com/lotebo-lab/page-audit-tool/examples/white-label-seo-audit-report-for-clients |
+| How do I check a site for SEO defects before it goes live? | https://apify.com/lotebo-lab/page-audit-tool/examples/check-a-site-for-seo-defects-before-launch |
+
+Who runs it: agencies and freelancers taking over a site, who need the defect list of the whole site before quoting the work; in-house marketing and content teams doing a periodic technical pass, where missing titles across a section matter more than one perfect page; developers preparing an accessibility review, who want the machine-checkable defects listed by page so the human review starts where the problems are; and anyone after a migration, when templates changed and nobody knows which pages lost their canonical link.
+
+## What goes in
+
+These are the fields of [`.actor/input_schema.json`](.actor/input_schema.json), with the defaults and the ranges the schema declares.
+
+| field | type | default | range |
+|---|---|---|---|
+| `startUrl` (required) | string | — | a bare domain (`example.com`, `https://` is assumed) or a full URL |
+| `maxPages` | integer | 25 | 1 to 5000; each page opened is one charged event |
+| `maxDepth` | integer | 3 | 0 to 20 clicks from the start page; 0 audits only the start page |
+| `requestDelaySeconds` | integer | 1 | 0 to 60 seconds between two requests to the same host |
+| `requestTimeoutSeconds` | integer | 15 | 3 to 120 seconds before a page is reported as a timeout |
+
+An example input, using the value the schema prefills for `startUrl`:
+
+```json
+{
+  "startUrl": "https://www.python.org",
+  "maxPages": 25,
+  "maxDepth": 3
+}
+```
+
+Start with ten pages whose problems you already know, and compare the rows with what you would find by hand.
+
+## What comes out
+
+One dataset row per page that answered with an HTML body, plus one run summary row. These are the fields declared in [`.actor/dataset_schema.json`](.actor/dataset_schema.json), which is the schema the Apify Console renders as the output table, and they are checked against what the code writes by `tests/test_schemas.py`.
 
 | field | type | what it holds |
 |---|---|---|
+| `rowType` | string | tells a page row from the run summary row |
 | `url` | string | the page URL after redirects, in one normalised spelling |
 | `status` | integer or null | the HTTP status of the page; `null` when there was no response |
 | `title` | string or null | the text of `<title>`, `null` when the page has none |
@@ -36,6 +73,10 @@ One dataset row per page that answered with an HTML body. These are all the colu
 | `canonicalMissing` | boolean | `true` when there is no canonical link |
 | `issues` | array of strings | one short sentence per problem found on this page; empty when the page passed every check |
 | `issueCount` | integer | how many entries `issues` has |
+
+The run summary row carries `startUrl`, `pagesCrawled`, `pagesAudited`, `pagesSkippedByRobots`, `pagesWithIssues`, `totalIssues`, `pagesWithoutH1`, `pagesWithMultipleH1`, `pagesWithBrokenHeadingOrder`, `durationSeconds`, `chargedEvents`, `chargeLimitReached`, `chargeFailures`, `finishedAt` and a one-sentence `message`.
+
+The dataset ships four ready-made views, declared in the same schema: **Page audit** (the row above, trimmed), **SEO fields**, **Accessibility fields** and **Run summary**. Every run also writes a `SUMMARY` record in the key-value store with the same totals plus `worstPages`, up to ten pages with their issue list.
 
 ### The twelve checks behind those fields
 
@@ -56,13 +97,9 @@ This is the complete list, and there is nothing else in the code. Each one has a
 | 11 | Form field labels | `2 form field(s) without a label` | `formFieldsWithoutLabel` |
 | 12 | Canonical link | `missing canonical link` | `canonicalMissing` |
 
-### The run summary
-
-Every run also writes a `SUMMARY` record in the key-value store with: `startUrl`, `pagesAudited`, `pagesWithIssues`, one total per defect type (`titleMissing`, `metaDescriptionMissing`, `pagesWithoutH1`, `pagesWithMultipleH1`, `pagesWithBrokenHeadingOrder`, `imagesWithoutAlt`, `formFieldsWithoutLabel`, `canonicalMissing`), `totalIssues`, `worstPages` (up to ten pages with their issue list) and the charging counters `chargedEvents`, `chargeLimitReached` and `chargeFailures`.
-
 ### Real output rows
 
-Copied from `logs/corrida-local-2026-09-20-canonico.log` in this repository: an end-to-end run of `src/main.py` against a five page test site whose defects were planted on purpose, served from disk at `127.0.0.1:8099` because the build sandbox has no route to the public internet. The run audited 5 pages and found 9 issues. The values are the ones in the log; the keys are reordered here to follow the table above.
+Copied from `logs/corrida-local-2026-09-20-canonico.log`: an end-to-end run of `src/main.py` against a five page test site whose defects were planted on purpose, served from disk at `127.0.0.1:8099` because the build sandbox has no route to the public internet. The run audited 5 pages and found 9 issues.
 
 A clean page, so you can see what "nothing wrong" looks like:
 
@@ -82,27 +119,16 @@ A page with images and a form field:
 {"url": "http://127.0.0.1:8099/imagem-sem-alt.html", "status": 200, "title": "Page with images that have no alt text", "titleLength": 38, "titleMissing": false, "metaDescription": "Two images without an alt attribute and one form field with no label of any kind.", "metaDescriptionMissing": false, "h1Count": 1, "headingOrderBroken": false, "imagesWithoutAlt": 2, "formFieldsWithoutLabel": 1, "canonical": "http://127.0.0.1:8099/imagem-sem-alt.html", "canonicalMissing": false, "issues": ["2 image(s) without alt text", "1 form field(s) without a label"], "issueCount": 2}
 ```
 
-## Input
+## Price
 
-The example below is the input this Actor is prefilled with, so you can press Start and read a real result before pointing it at your own site.
+Pay per event, two events. These are the prices in force on the platform, so they are what a run of yours is charged:
 
-```json
-{
-  "startUrl": "https://www.python.org",
-  "maxPages": 25,
-  "maxDepth": 3
-}
-```
+| event | price | when it is charged |
+|---|---|---|
+| `page-audited` | US$ 0.05 | once per audit row written to your dataset: an HTML page that answered 2xx and was checked. The same page in two URL spellings (`/` and `/index.html`) is charged once. HTTP errors, non-HTML files, redirects without content and pages blocked by `robots.txt` are not charged |
+| `site-report` | US$ 0.25 | once per run, and only when at least one page was audited |
 
-| field | type | default | range |
-|---|---|---|---|
-| `startUrl` (required) | string | — | a bare domain (`example.com`, `https://` is assumed) or a full URL |
-| `maxPages` | integer | 25 | 1 to 5000; each page opened is one charged event |
-| `maxDepth` | integer | 3 | 0 to 20 clicks from the start page; 0 audits only the start page |
-| `requestDelaySeconds` | integer | 1 | 0 to 60 seconds between two requests to the same host |
-| `requestTimeoutSeconds` | integer | 15 | 3 to 120 seconds before a page is reported as a timeout |
-
-Start with ten pages whose problems you already know, and compare the rows with what you would find by hand.
+A run of 25 pages is 25 `page-audited` events plus 1 `site-report`: US$ 1.50. Apify charges its own Actor start event and the platform usage of the run on top of this; that part is set by the platform, not by this Actor. If a run reaches the pay-per-event limit you set, the crawl stops, keeps everything audited so far, and the `site-report` is not charged.
 
 ## What this Actor does not do
 
@@ -114,7 +140,7 @@ Start with ten pages whose problems you already know, and compare the rows with 
 - **It does not report redirect chains.** Redirects are followed and only the final URL is kept.
 - **It does not check whether links work.** Link targets are never requested; that is a different tool.
 - **It does not audit PDFs, images or any other non-HTML file**, and it does not follow links to them.
-- **It does not crawl past the caps.** It stops at `maxPages` or `maxDepth`, whichever comes first, and pages nobody links to from the start URL are never found. It does not follow subdomains.
+- **It does not crawl past the caps.** It stops at `maxPages` or `maxDepth`, whichever comes first, pages nobody links to from the start URL are never found, and it does not follow subdomains.
 - **It does not log in, fill forms, solve captchas or get past a paywall.**
 - **It does not predict rankings, traffic or revenue, and it makes no claim about any of them.**
 - **It does not collect personal data.** The output holds page URLs, statuses, tag text, counts and the canonical URL. Page bodies are parsed in memory and discarded; `mailto:` and `tel:` links are skipped.
@@ -123,7 +149,7 @@ Start with ten pages whose problems you already know, and compare the rows with 
 
 This Actor measures technical rules that can be checked automatically in HTML source, and nothing else.
 
-**It does not certify, attest or declare conformity with Directive (EU) 2019/882 (the European Accessibility Act), with the Web Content Accessibility Guidelines (WCAG), or with any other accessibility standard, law or search engine guideline.** A row with no issues means the twelve checks above found nothing on that page, not that the page is accessible, not that it is compliant, and not that it will rank.
+**It does not certify, attest or declare conformity with Directive (EU) 2019/882 (the European Accessibility Act), with the Web Content Accessibility Guidelines (WCAG), or with any other accessibility standard, law or search engine guideline.** A row with no issues means the twelve checks above found nothing on that page, not that the page is accessible and not that it is compliant.
 
 Accessibility conformity depends on judgement a program cannot make: whether alt text describes the image, whether a label makes sense to the person reading it, whether the page works with a keyboard and a screen reader. Use this Actor to find the machine-checkable defects across a whole site, then have a person review what it found.
 
@@ -135,32 +161,22 @@ Accessibility conformity depends on judgement a program cannot make: whether alt
 - **Only the first 3 MB of a page body is read**, and only when the response looks like HTML.
 - **You are responsible for having the right to access the URLs you give it.** Check the terms of the site and its `robots.txt` before you run it, and check whether your own agreement with that site allows automated access.
 
-## Price
+## How this was checked
 
-Pay per event, two events, exactly as declared in `.actor/actor.json`:
+Every check in the twelve-row table has a test in `tests/test_page_checks.py`, and the crawl was run end to end against the pages in `tests/site/`, which is where the three rows quoted above come from. `tests/test_schemas.py` compares the four files in `.actor/` against what the code actually writes, field by field. The suite runs with the plain interpreter and no network.
 
-| event | price | when it is charged |
-|---|---|---|
-| `page-audited` | US$ 0.05 | once per page fetched and checked. The same page in two URL spellings (`/` and `/index.html`) is charged once |
-| `site-report` | US$ 0.25 | once per run, and only when at least one page was audited |
+**What has never been tested, stated plainly:** no paid bill has ever come out of this Actor. Charging has been exercised on the platform, and a charge that fails or times out is a warning in the log rather than the end of the run, but no invoice has ever been produced by it. No site behind a login, a paywall or a bot filter was audited, and no site of tens of thousands of pages.
 
-A default run of 25 pages is 25 `page-audited` events plus 1 `site-report`: US$ 1.50. Apify charges its own Actor start event and the platform usage of the run on top of this; those are not set by this Actor.
+## For developers
 
-A page that is requested but never answers with an HTML body (timeout, DNS error, a non-HTML response) still cost one request, so it is charged as one `page-audited` event and appears in the run log without a dataset row. If a run reaches your pay-per-event limit, the crawl stops, keeps everything audited so far, and the `site-report` is not charged.
+```
+.actor/              actor.json, input, output and dataset schemas
+src/                 the run: crawl, the twelve page checks, charging, summary
+tests/               the offline suite plus tests/site/, the planted-defect fixture
+```
 
-## About this Actor
+The Actor is written in Python and was built with the help of AI.
 
-The code, the tests and the run log quoted here are in this repository. Every check in the table has a test in `tests/test_page_checks.py`, and the crawl was run end to end against the pages in `tests/site/`. The Actor is written in Python and was built with the help of AI.
+---
 
-## Example tasks
-
-Each page below is a published example task of this Actor. It shows the input used and the fields the run returns. The same page is served as Markdown by adding `.md` to the URL.
-
-- [Is my site compliant with the European Accessibility Act?](https://apify.com/lotebo-lab/page-audit-tool/examples/european-accessibility-act-website-check): crawls a site page by page and lists the automated WCAG checks the European Accessibility Act covers, with the failing element on each row.
-- [Generate a white label SEO audit report for a client](https://apify.com/lotebo-lab/page-audit-tool/examples/white-label-seo-audit-report-for-clients): crawls a client site and exports one row per page with the technical SEO fields an agency pastes straight into the report it sells.
-- [Find every image with missing alt text on a website](https://apify.com/lotebo-lab/page-audit-tool/examples/find-images-missing-alt-text): crawls a whole site and lists every image with no alt text or an empty one, together with the page it sits on.
-- [Which pages on my site have no title or meta description?](https://apify.com/lotebo-lab/page-audit-tool/examples/find-pages-missing-title-and-meta-description): crawls a domain and returns one row per page with its title, meta description, canonical tag and heading order, so you see what is missing or duplicated before a client does.
-- [How do I list every image missing alt text on my site?](https://apify.com/lotebo-lab/page-audit-tool/examples/list-images-without-alt-text-on-a-site): crawls a domain and returns one row per page with the images that have no alt text and the form fields with no label, the two checks an accessibility review asks for first.
-- [Which pages on my site have no meta description?](https://apify.com/lotebo-lab/page-audit-tool/examples/find-pages-missing-meta-description): crawls the whole site from one starting URL and returns every page with no meta description, next to its title length and canonical link.
-- [Find pages with no H1 or a broken heading order](https://apify.com/lotebo-lab/page-audit-tool/examples/find-pages-with-no-h1-or-broken-heading-order): lists pages with no h1, with more than one h1 or with a heading level skipped, next to images without alt text and fields without a label.
-- [Check a site for SEO defects before it goes live](https://apify.com/lotebo-lab/page-audit-tool/examples/check-a-site-for-seo-defects-before-launch): ends with a single summary row: pages crawled, pages with defects, total defects and what robots.txt blocked.
+**Actor page on the Apify Store: https://apify.com/lotebo-lab/page-audit-tool**
